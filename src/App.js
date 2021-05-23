@@ -1,5 +1,5 @@
 import "./App.css";
-import Game from "./TetrisGame/Game";
+import Game from "./components/TetrisGame/Game";
 
 function App() {
   return (
