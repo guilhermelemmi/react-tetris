@@ -26,8 +26,32 @@
   width: 30px;
 }
 
-.cell.active {
-  background: #ff0000;
+.cell.i {
+  background: #0441ae;
+}
+
+.cell.l {
+  background: #82cb3b;
+}
+
+.cell.j {
+  background: #fed500;
+}
+
+.cell.s {
+  background: #fd971c;
+}
+
+.cell.z {
+  background: #fe3213;
+}
+
+.cell.t {
+  background: #ffff00;
+}
+
+.cell.o {
+  background: #00ffff;
 }
 
 .tiles {
