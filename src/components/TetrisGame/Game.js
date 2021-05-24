@@ -97,17 +97,21 @@ function Game() {
       pieceCoordinates
         .filter((block) => block > 0)
         .some((block) => {
-          console.log("block", block);
           const coords = block.toString().split("");
-          console.log("coords", coords);
           const col = parseInt(coords.pop(), 10);
-          console.log("col", col);
-          const row = coords.length ? parseInt(coords.join(""), 10) + 1 : 1;
-          console.log("row", row);
-          return board[row][col];
+          const row = coords.length ? parseInt(coords.join(""), 10) : 0;
+          return board[row + 1][col];
         })
     );
   }, [pieceCoordinates, board]);
+
+  const isAtTheEdge = useCallback((block, goingLeft = false) => {
+    const col = parseInt(block.toString().split("").pop(), 10);
+    if (goingLeft) {
+      return col === 0;
+    }
+    return col === n - 1;
+  }, []);
 
   const move = useCallback(
     (increment) => {
@@ -128,10 +132,14 @@ function Game() {
     (e) => {
       switch (e.code) {
         case "ArrowLeft":
-          move(-1);
+          if (!pieceCoordinates.some((block) => isAtTheEdge(block, true))) {
+            move(-1);
+          }
           break;
         case "ArrowRight":
-          move(1);
+          if (!pieceCoordinates.some((block) => isAtTheEdge(block, false))) {
+            move(1);
+          }
           break;
         case "ArrowDown":
           move(10);
