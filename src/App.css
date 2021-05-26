@@ -1,15 +1,55 @@
-.game {
+body,
+main {
+  margin: 0;
+  padding: 0;
+}
+
+.gameOver {
   position: absolute;
-  width: 355px;
-  left: 50%;
-  margin-left: -212px;
+  z-index: 5;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -20px;
+}
+
+.game {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 0 0;
+  padding: 0;
 }
 
 .board {
-  position: absolute;
   background: #333;
   width: 355px;
   height: 705px;
+  margin-left: calc(15% + 60px);
+}
+
+.sidebar {
+  width: calc(15% + 60px);
+  padding: 0 30px;
+}
+
+.score,
+.level,
+.nextPiece {
+  border: 1px solid #222;
+  border-radius: 5px;
+  margin-top: 30px;
+  text-align: right;
+  padding: 10px;
+}
+
+.score h3,
+.level h3,
+.nextPiece h3 {
+  margin: 0;
 }
 
 .row {
@@ -26,31 +66,31 @@
   width: 30px;
 }
 
-.cell.i {
+.cell.I {
   background: #0441ae;
 }
 
-.cell.l {
+.cell.L {
   background: #82cb3b;
 }
 
-.cell.j {
+.cell.J {
   background: #fed500;
 }
 
-.cell.s {
+.cell.S {
   background: #fd971c;
 }
 
-.cell.z {
+.cell.Z {
   background: #fe3213;
 }
 
-.cell.t {
+.cell.T {
   background: #ffff00;
 }
 
-.cell.o {
+.cell.O {
   background: #00ffff;
 }
 

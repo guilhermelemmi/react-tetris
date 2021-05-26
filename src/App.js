@@ -3,9 +3,9 @@ import Game from "./components/TetrisGame/Game";
 
 function App() {
   return (
-    <div className="App">
+    <main className="App">
       <Game />
-    </div>
+    </main>
   );
 }
 
