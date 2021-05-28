@@ -7,10 +7,12 @@ const initialType = TYPES[Math.floor(Math.random() * TYPES.length)];
 
 function Game() {
   let [delay, setDelay] = useState(1000);
-  let [level, setLevel] = useState(1);
-  let [score, setScore] = useState(0);
   let [isRunning, setIsRunning] = useState(true);
   let [isOver, setIsOver] = useState(false);
+
+  let [level, setLevel] = useState(1);
+  let [score, setScore] = useState(0);
+  let [lines, setLines] = useState(0);
 
   let [board, setBoard] = useState(INITIAL_BOARD);
   let [pieceType, setPieceType] = useState(initialType);
@@ -51,9 +53,12 @@ function Game() {
     (increment) => {
       if (!willCollide()) {
         setPieceCoordinates(pieceCoordinates.map((block) => block + increment));
+        if (increment > 1) {
+          setScore(score + 1);
+        }
       }
     },
-    [pieceCoordinates, willCollide]
+    [pieceCoordinates, willCollide, score]
   );
 
   const rotate = useCallback(() => {
@@ -61,6 +66,8 @@ function Game() {
     setPieceRotation(newRotation);
     setPieceCoordinates(SHAPES[pieceType][newRotation](n, pieceCoordinates[1]));
   }, [pieceCoordinates, pieceRotation, pieceType]);
+
+  const hardDrop = useCallback(() => {}, []);
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -78,13 +85,16 @@ function Game() {
         case KEYS.ARROW_DOWN:
           move(10);
           break;
-        case KEYS.SPACE:
+        case KEYS.ARROW_UP:
           rotate();
+          break;
+        case KEYS.SPACE:
+          hardDrop();
           break;
         default:
       }
     },
-    [move, rotate, isAtTheEdge, pieceCoordinates]
+    [move, rotate, hardDrop, isAtTheEdge, pieceCoordinates]
   );
 
   useInterval(
@@ -111,7 +121,7 @@ function Game() {
         setPieceType(nextPieceType);
         setPieceCoordinates(SHAPES[nextPieceType][0](n, 5));
         setPieceRotation(0);
-        setNextPieceType("I"); //TYPES[Math.floor(Math.random() * TYPES.length)]);
+        setNextPieceType(TYPES[Math.floor(Math.random() * TYPES.length)]);
       }
     },
     isRunning ? delay : null
@@ -135,14 +145,16 @@ function Game() {
 
     if (rowsToClear.length) {
       setIsRunning(false);
-      const bonus = rowsToClear.length > 1 ? 1 + rowsToClear.length / 10 : 1;
-      const newScore = score + rowsToClear.length * bonus * 100;
-      setScore(newScore);
+      setLines(lines + rowsToClear.length);
 
-      if (newScore / 1000 > level) {
-        setLevel(Math.floor(newScore / 1000));
+      if (lines / 10 > level) {
+        setLevel(Math.floor(lines / 10));
         setDelay(delay * 0.95);
       }
+
+      const bonus = rowsToClear.length - 1;
+      const newScore = score + (rowsToClear.length + bonus) * 100 * level;
+      setScore(newScore);
 
       let updatedBoard = [...board];
       for (let i = 0; i < rowsToClear.length; i++) {
@@ -153,7 +165,7 @@ function Game() {
       setBoard(updatedBoard);
       setIsRunning(true);
     }
-  }, [board, delay, level, score]);
+  }, [board, lines, level, delay, score]);
 
   const rows = board.map((row, i) => {
     const cells = row.map((cell, j) => (
@@ -176,8 +188,7 @@ function Game() {
         </div>
       )}
       <section tabIndex="0" className="game" onKeyDown={handleKeyDown}>
-        <section className="board">{rows}</section>
-        <section className="sidebar">
+        <section className="sidebar left">
           <div className="score">
             <h3>Score</h3>
             <div>{score}</div>
@@ -186,6 +197,13 @@ function Game() {
             <h3>Level</h3>
             <div>{level}</div>
           </div>
+          <div className="lines">
+            <h3>Lines</h3>
+            <div>{lines}</div>
+          </div>
+        </section>
+        <section className="board">{rows}</section>
+        <section className="sidebar">
           <div className="nextPiece">
             <h3>Next</h3>
             <div>{nextPieceType}</div>

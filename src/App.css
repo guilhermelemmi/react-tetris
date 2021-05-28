@@ -25,10 +25,9 @@ main {
 }
 
 .board {
-  background: #333;
+  background: #222;
   width: 355px;
   height: 705px;
-  margin-left: calc(15% + 60px);
 }
 
 .sidebar {
@@ -36,18 +35,35 @@ main {
   padding: 0 30px;
 }
 
+.sidebar.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
 .score,
 .level,
+.lines {
+  margin-bottom: 30px;
+}
+
+.nextPiece {
+  margin-top: 30px;
+}
+
+.score,
+.level,
+.lines,
 .nextPiece {
   border: 1px solid #222;
   border-radius: 5px;
-  margin-top: 30px;
   text-align: right;
   padding: 10px;
 }
 
 .score h3,
 .level h3,
+.lines h3,
 .nextPiece h3 {
   margin: 0;
 }
@@ -60,7 +76,7 @@ main {
 }
 
 .cell {
-  background: #ccc;
+  background: #444;
   height: 30px;
   margin-left: 5px;
   width: 30px;
