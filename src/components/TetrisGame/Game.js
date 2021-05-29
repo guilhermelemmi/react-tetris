@@ -187,25 +187,25 @@ function Game() {
           <h1>Game Over</h1>
         </div>
       )}
-      <section tabIndex="0" className="game" onKeyDown={handleKeyDown}>
+      <section className="game" onKeyDown={handleKeyDown}>
         <section className="sidebar left">
           <div className="score">
-            <h3>Score</h3>
+            <h4>Score</h4>
             <div>{score}</div>
           </div>
           <div className="level">
-            <h3>Level</h3>
+            <h4>Level</h4>
             <div>{level}</div>
           </div>
           <div className="lines">
-            <h3>Lines</h3>
+            <h4>Lines</h4>
             <div>{lines}</div>
           </div>
         </section>
         <section className="board">{rows}</section>
         <section className="sidebar">
           <div className="nextPiece">
-            <h3>Next</h3>
+            <h4>Next</h4>
             <div>{nextPieceType}</div>
           </div>
         </section>

@@ -2,6 +2,9 @@ body,
 main {
   margin: 0;
   padding: 0;
+  background: #121522;
+  color: #f8f8f2;
+  font-family: "Segoe UI", Verdana, Tahoma, Geneva, sans-serif;
 }
 
 .gameOver {
@@ -20,18 +23,19 @@ main {
   width: 100%;
   display: flex;
   justify-content: center;
-  margin: 20px 0 0 0;
-  padding: 0;
+  margin: 0;
+  padding: 20px 0;
+  border-style: none;
 }
 
 .board {
-  background: #222;
+  background: #20222b;
   width: 355px;
   height: 705px;
 }
 
 .sidebar {
-  width: calc(15% + 60px);
+  width: calc(12% + 60px);
   padding: 0 30px;
 }
 
@@ -47,6 +51,12 @@ main {
   margin-bottom: 30px;
 }
 
+.score div,
+.level div,
+.lines div {
+  font-size: 2rem;
+}
+
 .nextPiece {
   margin-top: 30px;
 }
@@ -55,16 +65,16 @@ main {
 .level,
 .lines,
 .nextPiece {
+  background: #20222b;
   border: 1px solid #222;
   border-radius: 5px;
-  text-align: right;
   padding: 10px;
 }
 
-.score h3,
-.level h3,
-.lines h3,
-.nextPiece h3 {
+.score h4,
+.level h4,
+.lines h4,
+.nextPiece h4 {
   margin: 0;
 }
 
@@ -76,38 +86,38 @@ main {
 }
 
 .cell {
-  background: #444;
+  background: #2c2f42;
   height: 30px;
   margin-left: 5px;
   width: 30px;
 }
 
 .cell.I {
-  background: #0441ae;
+  background: #ff5555;
 }
 
 .cell.L {
-  background: #82cb3b;
+  background: #50fa7b;
 }
 
 .cell.J {
-  background: #fed500;
+  background: #ff79c6;
 }
 
 .cell.S {
-  background: #fd971c;
+  background: #ffb86c;
 }
 
 .cell.Z {
-  background: #fe3213;
+  background: #bd93f9;
 }
 
 .cell.T {
-  background: #ffff00;
+  background: #f1fa8c;
 }
 
 .cell.O {
-  background: #00ffff;
+  background: #8be9fd;
 }
 
 .tiles {
