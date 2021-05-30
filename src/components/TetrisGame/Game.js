@@ -122,7 +122,7 @@ function Game() {
         setPieceType(nextPieceType);
         setPieceCoordinates(SHAPES[nextPieceType][0](n, 5));
         setPieceRotation(0);
-        setNextPieceType(TYPES[Math.floor(Math.random() * TYPES.length)]);
+        setNextPieceType("I"); ///TYPES[Math.floor(Math.random() * TYPES.length)]);
       }
     },
     isRunning ? delay : null
@@ -146,10 +146,12 @@ function Game() {
 
     if (rowsToClear.length) {
       setIsRunning(false);
-      setLines(lines + rowsToClear.length);
+      const newLines = lines + rowsToClear.length;
+      setLines(newLines);
 
-      if (lines / 10 > level) {
-        setLevel(Math.floor(lines / 10));
+      const levelForLines = Math.floor(newLines / 10) + 1;
+      if (levelForLines > level) {
+        setLevel(levelForLines);
         setDelay(delay * 0.95);
       }
 
