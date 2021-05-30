@@ -29,7 +29,7 @@ function NextPiece({ pieceType }) {
     );
   });
 
-  return <div>{rows}</div>;
+  return <div className="board">{rows}</div>;
 }
 
 export default NextPiece;

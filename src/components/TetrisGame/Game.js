@@ -239,7 +239,7 @@ function Game() {
           level={state.level}
           lines={state.lines}
         />
-        <section className="board">{rows}</section>
+        <section className="board main-board">{rows}</section>
         <RightSidebar nextPieceType={state.nextPieceType} />
       </section>
     </>
