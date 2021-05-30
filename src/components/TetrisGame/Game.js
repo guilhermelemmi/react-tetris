@@ -1,6 +1,7 @@
 import { useReducer, useEffect, useCallback } from "react";
 import { getInitialState, KEYS, COLUMN_COUNT } from "../../constants";
 import useInterval from "../../hooks/useInterval";
+import useKeypress from "../../hooks/useKeypress";
 import gameReducer from "../../reducers/game.reducer";
 import Board from "./Board";
 import GameOver from "./GameOver";
@@ -25,6 +26,7 @@ const memoizedGetCoordinatesFromBlock = (() => {
 
 function Game() {
   const [state, dispatch] = useReducer(gameReducer, { ...initialState });
+  const { keyPressed } = useKeypress();
 
   const {
     isOver,
@@ -80,19 +82,22 @@ function Game() {
     isRunning ? delay : null
   );
 
-  useEffect(() => {
-    const move = (increment) => {
-      if (!willCollide()) {
-        dispatch({
-          type: "setPieceCoordinates",
-          value: pieceCoordinates.map((block) => block + increment),
-        });
-        if (increment > 1) {
-          dispatch({ type: "incrementScore" });
-        }
-      }
-    };
+  const move = (increment) => {
+    if (willCollide()) {
+      return false;
+    }
 
+    dispatch({
+      type: "setPieceCoordinates",
+      value: pieceCoordinates.map((block) => block + increment),
+    });
+
+    if (increment > 1) {
+      dispatch({ type: "incrementScore" });
+    }
+  };
+
+  useEffect(() => {
     const isAtTheEdge = (block, goingLeft = false) => {
       const col = parseInt(block.toString().split("").pop(), 10);
       if (goingLeft) {
@@ -101,39 +106,41 @@ function Game() {
       return col === COLUMN_COUNT - 1;
     };
 
-    const handleKeyDown = (e) => {
-      switch (e.code) {
-        case KEYS.ARROW_LEFT:
-          if (!pieceCoordinates.some((block) => isAtTheEdge(block, true))) {
-            move(-1);
-          }
-          break;
-        case KEYS.ARROW_RIGHT:
-          if (!pieceCoordinates.some((block) => isAtTheEdge(block, false))) {
-            move(1);
-          }
-          break;
-        case KEYS.ARROW_DOWN:
-          move(10);
-          break;
-        case KEYS.ARROW_UP:
-          dispatch({
-            type: "setPieceRotation",
-            value: pieceRotation !== 270 ? pieceRotation + 90 : 0,
-          });
-          break;
-        case KEYS.SPACE:
-          // hardDrop();
-          break;
-        default:
-      }
-    };
+    // const handleKeyDown =
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    // window.addEventListener("keydown", handleKeyDown);
+    // return () => {
+    //   window.removeEventListener("keydown", handleKeyDown);
+    // };
   }, [pieceRotation, pieceCoordinates, willCollide]);
+
+  useEffect(() => {
+    switch (keyPressed) {
+      case KEYS.ARROW_LEFT:
+        if (!pieceCoordinates.some((block) => isAtTheEdge(block, true))) {
+          move(-1);
+        }
+        break;
+      case KEYS.ARROW_RIGHT:
+        if (!pieceCoordinates.some((block) => isAtTheEdge(block, false))) {
+          move(1);
+        }
+        break;
+      case KEYS.ARROW_DOWN:
+        move(10);
+        break;
+      case KEYS.ARROW_UP:
+        dispatch({
+          type: "setPieceRotation",
+          value: pieceRotation !== 270 ? pieceRotation + 90 : 0,
+        });
+        break;
+      case KEYS.SPACE:
+        // hardDrop();
+        break;
+      default:
+    }
+  }, [keyPressed]);
 
   useEffect(() => {
     let rowsToClear = [];
