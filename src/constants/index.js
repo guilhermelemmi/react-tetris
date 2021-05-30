@@ -1,4 +1,4 @@
-export const INITIAL_BOARD = [
+export const getInitialBoard = () => [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

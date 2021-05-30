@@ -19,6 +19,17 @@ main {
   margin-top: -20px;
 }
 
+.button {
+  border: 1px solid #f8f8f2;
+  width: 150px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .game {
   width: 100%;
   display: flex;

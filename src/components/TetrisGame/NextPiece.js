@@ -18,9 +18,15 @@ function NextPiece({ pieceType }) {
         pieceCoordinates.indexOf(parseInt(`${1 + j + i * n}`, 10)) >= 0
           ? pieceType
           : "";
-      return <div className={`cell ${pieceTypeClass}`}></div>;
+      return (
+        <div key={`cellnext-${j}`} className={`cell ${pieceTypeClass}`}></div>
+      );
     });
-    return <div className="row">{cells}</div>;
+    return (
+      <div key={`rownext-${i}`} className="row">
+        {cells}
+      </div>
+    );
   });
 
   return <div>{rows}</div>;
