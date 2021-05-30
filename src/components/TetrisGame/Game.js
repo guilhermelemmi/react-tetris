@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { INITIAL_BOARD, KEYS, TYPES, SHAPES } from "../../constants";
 import useInterval from "../../hooks/useInterval";
+import NextPiece from "./NextPiece";
 
 const n = INITIAL_BOARD[0].length;
 const initialType = TYPES[Math.floor(Math.random() * TYPES.length)];
@@ -206,7 +207,7 @@ function Game() {
         <section className="sidebar">
           <div className="nextPiece">
             <h4>Next</h4>
-            <div>{nextPieceType}</div>
+            <NextPiece pieceType={nextPieceType} />
           </div>
         </section>
       </section>

@@ -35,7 +35,7 @@ main {
 }
 
 .sidebar {
-  width: calc(12% + 60px);
+  width: 170px;
   padding: 0 30px;
 }
 
@@ -54,7 +54,7 @@ main {
 .score div,
 .level div,
 .lines div {
-  font-size: 2rem;
+  font-size: 1.7rem;
 }
 
 .nextPiece {
