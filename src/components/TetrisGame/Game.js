@@ -1,6 +1,7 @@
-import { useReducer, useEffect, useCallback } from "react";
+import { useReducer, useEffect, useCallback, useMemo } from "react";
 import { getInitialBoard, KEYS, TYPES, SHAPES } from "../../constants";
 import useInterval from "../../hooks/useInterval";
+import Board from "./Board";
 import GameOver from "./GameOver";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
@@ -84,24 +85,49 @@ const reducer = (state, action) => {
   }
 };
 
+const memoizedGetCoordinatesFromBlock = (() => {
+  const cache = {};
+  return (block) => {
+    if (cache[block]) {
+      return cache[block];
+    }
+    const coords = block.toString().split("");
+    const col = parseInt(coords.pop(), 10);
+    const row = coords.length ? parseInt(coords.join(""), 10) : 0;
+    cache[block] = [row, col];
+    return cache[block];
+  };
+})();
+
 function Game() {
   const [state, dispatch] = useReducer(reducer, { ...initialState });
 
+  const {
+    isOver,
+    isRunning,
+    delay,
+    score,
+    level,
+    lines,
+    board,
+    pieceCoordinates,
+    pieceType,
+    pieceRotation,
+    nextPieceType,
+  } = state;
+
   const willCollide = useCallback(() => {
-    const isAtBottomRow =
-      Math.max(...state.pieceCoordinates) / n >= state.board.length - 1;
+    const isAtBottomRow = Math.max(...pieceCoordinates) / n >= board.length - 1;
     return (
       isAtBottomRow ||
-      state.pieceCoordinates
+      pieceCoordinates
         .filter((block) => block > 0)
         .some((block) => {
-          const coords = block.toString().split("");
-          const col = parseInt(coords.pop(), 10);
-          const row = coords.length ? parseInt(coords.join(""), 10) : 0;
-          return state.board[row + 1][col];
+          const [row, col] = memoizedGetCoordinatesFromBlock(block);
+          return board[row + 1][col];
         })
     );
-  }, [state.pieceCoordinates, state.board]);
+  }, [pieceCoordinates, board]);
 
   const hardDrop = useCallback(() => {}, []);
 
@@ -110,16 +136,14 @@ function Game() {
       if (!willCollide()) {
         dispatch({
           type: "setPieceCoordinates",
-          value: state.pieceCoordinates.map((block) => block + 10),
+          value: pieceCoordinates.map((block) => block + 10),
         });
       } else {
-        let updatedBoard = [...state.board];
-        state.pieceCoordinates.forEach((block) => {
-          const coords = block.toString().split("");
-          const col = parseInt(coords.pop(), 10);
-          const row = parseInt(coords.join(""), 10);
+        let updatedBoard = [...board];
+        pieceCoordinates.forEach((block) => {
+          const [row, col] = memoizedGetCoordinatesFromBlock(block);
           if (updatedBoard[row]) {
-            updatedBoard[parseInt(coords.join(""), 10)][col] = state.pieceType;
+            updatedBoard[row][col] = pieceType;
           } else {
             dispatch({ type: "setGameOver" });
             return;
@@ -128,7 +152,7 @@ function Game() {
         dispatch({ type: "settlePiece", value: updatedBoard });
       }
     },
-    state.isRunning ? state.delay : null
+    isRunning ? delay : null
   );
 
   useEffect(() => {
@@ -136,7 +160,7 @@ function Game() {
       if (!willCollide()) {
         dispatch({
           type: "setPieceCoordinates",
-          value: state.pieceCoordinates.map((block) => block + increment),
+          value: pieceCoordinates.map((block) => block + increment),
         });
         if (increment > 1) {
           dispatch({ type: "incrementScore" });
@@ -155,16 +179,12 @@ function Game() {
     const handleKeyDown = (e) => {
       switch (e.code) {
         case KEYS.ARROW_LEFT:
-          if (
-            !state.pieceCoordinates.some((block) => isAtTheEdge(block, true))
-          ) {
+          if (!pieceCoordinates.some((block) => isAtTheEdge(block, true))) {
             move(-1);
           }
           break;
         case KEYS.ARROW_RIGHT:
-          if (
-            !state.pieceCoordinates.some((block) => isAtTheEdge(block, false))
-          ) {
+          if (!pieceCoordinates.some((block) => isAtTheEdge(block, false))) {
             move(1);
           }
           break;
@@ -174,7 +194,7 @@ function Game() {
         case KEYS.ARROW_UP:
           dispatch({
             type: "setPieceRotation",
-            value: state.pieceRotation !== 270 ? state.pieceRotation + 90 : 0,
+            value: pieceRotation !== 270 ? pieceRotation + 90 : 0,
           });
           break;
         case KEYS.SPACE:
@@ -188,12 +208,12 @@ function Game() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [state.pieceRotation, state.pieceCoordinates, willCollide]);
+  }, [pieceRotation, pieceCoordinates, willCollide]);
 
   useEffect(() => {
     let rowsToClear = [];
-    for (let i = state.board.length - 1; i >= 0; i--) {
-      const row = state.board[i];
+    for (let i = board.length - 1; i >= 0; i--) {
+      const row = board[i];
       if (row.every((cell) => cell)) {
         rowsToClear.push(i);
       }
@@ -204,29 +224,11 @@ function Game() {
       dispatch({ type: "clearRows", value: rowsToClear });
       dispatch({ type: "setIsRunning", value: true });
     }
-  }, [state.board]);
-
-  const rows = state.board.map((row, i) => {
-    const cells = row.map((cell, j) => (
-      <div
-        key={`cell-${j}`}
-        className={`cell ${cell ? cell : ""} ${
-          state.pieceCoordinates.indexOf(parseInt(`${i}${j}`, 10)) >= 0
-            ? state.pieceType
-            : ""
-        }`}
-      ></div>
-    ));
-    return (
-      <div key={`row-${i}`} className="row">
-        {cells}
-      </div>
-    );
-  });
+  }, [board]);
 
   return (
     <>
-      {state.isOver && (
+      {isOver && (
         <GameOver
           onPlayAgain={() => {
             dispatch({ type: "resetState" });
@@ -234,13 +236,13 @@ function Game() {
         />
       )}
       <section className="game">
-        <LeftSidebar
-          score={state.score}
-          level={state.level}
-          lines={state.lines}
+        <LeftSidebar score={score} level={level} lines={lines} />
+        <Board
+          board={board}
+          pieceCoordinates={pieceCoordinates}
+          pieceType={pieceType}
         />
-        <section className="board main-board">{rows}</section>
-        <RightSidebar nextPieceType={state.nextPieceType} />
+        <RightSidebar nextPieceType={nextPieceType} />
       </section>
     </>
   );
