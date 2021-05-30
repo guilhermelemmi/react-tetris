@@ -1,89 +1,13 @@
-import { useReducer, useEffect, useCallback, useMemo } from "react";
-import { getInitialBoard, KEYS, TYPES, SHAPES } from "../../constants";
+import { useReducer, useEffect, useCallback } from "react";
+import { getInitialState, KEYS, COLUMN_COUNT } from "../../constants";
 import useInterval from "../../hooks/useInterval";
+import gameReducer from "../../reducers/game.reducer";
 import Board from "./Board";
 import GameOver from "./GameOver";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
 
-const initialBoard = getInitialBoard();
-const n = initialBoard[0].length;
-const initialType = TYPES[Math.floor(Math.random() * TYPES.length)];
-
-const initialState = {
-  board: initialBoard,
-  level: 1,
-  score: 0,
-  lines: 0,
-  pieceType: initialType,
-  pieceRotation: 0,
-  pieceCoordinates: SHAPES[initialType][0](n, n / 2),
-  nextPieceType: TYPES[Math.floor(Math.random() * TYPES.length)],
-  delay: 1000,
-  isOver: false,
-  isRunning: true,
-};
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "setPieceCoordinates":
-      return { ...state, pieceCoordinates: action.value };
-    case "setScore":
-      return { ...state, score: action.value };
-    case "incrementScore":
-      return { ...state, score: state.score + 1 };
-    case "setPieceRotation":
-      return {
-        ...state,
-        pieceRotation: action.value,
-        pieceCoordinates: SHAPES[state.pieceType][action.value](
-          n,
-          state.pieceCoordinates[1]
-        ),
-      };
-    case "setGameOver":
-      return { ...state, isOver: true, isRunning: false };
-    case "setIsRunning":
-      return { ...state, isRunning: action.value };
-    case "settlePiece":
-      return {
-        ...state,
-        board: action.value,
-        pieceType: state.nextPieceType,
-        pieceCoordinates: SHAPES[state.nextPieceType][0](n, 5),
-        pieceRotation: 0,
-        nextPieceType: TYPES[Math.floor(Math.random() * TYPES.length)],
-      };
-    case "clearRows":
-      const newLines = state.lines + action.value.length;
-      const levelForLines = Math.floor(newLines / 10) + 1;
-      const level = levelForLines > state.level ? levelForLines : state.level;
-      const delay =
-        levelForLines > state.level ? state.delay * 0.95 : state.delay;
-      const bonus = action.value.length - 1;
-      const newScore =
-        state.score + (action.value.length + bonus) * 100 * state.level;
-      let updatedBoard = [...state.board];
-      for (let i = 0; i < action.value.length; i++) {
-        updatedBoard.splice(action.value[i] + i, 1);
-        updatedBoard.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-      }
-      return {
-        ...state,
-        lines: newLines,
-        level: level,
-        delay: delay,
-        score: newScore,
-        board: updatedBoard,
-      };
-    case "resetState":
-      return {
-        ...initialState,
-        board: getInitialBoard(),
-      };
-    default:
-  }
-};
+const initialState = getInitialState();
 
 const memoizedGetCoordinatesFromBlock = (() => {
   const cache = {};
@@ -100,7 +24,7 @@ const memoizedGetCoordinatesFromBlock = (() => {
 })();
 
 function Game() {
-  const [state, dispatch] = useReducer(reducer, { ...initialState });
+  const [state, dispatch] = useReducer(gameReducer, { ...initialState });
 
   const {
     isOver,
@@ -117,7 +41,8 @@ function Game() {
   } = state;
 
   const willCollide = useCallback(() => {
-    const isAtBottomRow = Math.max(...pieceCoordinates) / n >= board.length - 1;
+    const isAtBottomRow =
+      Math.max(...pieceCoordinates) / COLUMN_COUNT >= board.length - 1;
     return (
       isAtBottomRow ||
       pieceCoordinates
@@ -173,7 +98,7 @@ function Game() {
       if (goingLeft) {
         return col === 0;
       }
-      return col === n - 1;
+      return col === COLUMN_COUNT - 1;
     };
 
     const handleKeyDown = (e) => {
@@ -220,9 +145,7 @@ function Game() {
     }
 
     if (rowsToClear.length) {
-      dispatch({ type: "setIsRunning", value: false });
       dispatch({ type: "clearRows", value: rowsToClear });
-      dispatch({ type: "setIsRunning", value: true });
     }
   }, [board]);
 
